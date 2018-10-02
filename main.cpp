@@ -1,16 +1,19 @@
 // compile with: g++ template_structured_matrix_vector.cpp -I/usr/include/eigen3 -lmgl
 
-//#include <chrono>
+#include <chrono>
 #include <iostream>
 #include <iomanip>
 //#include <limits>
-//#include <ratio>
+#include <ratio>
 #include <vector>
 
 #include <eigen3/Eigen/Dense>
 #include <mgl2/mgl.h>
 
 using namespace Eigen;
+using namespace std;
+using namespace std::chrono;
+
 
 /* \brief compute $\mathbf{A}\mathbf{x}$
  * \mathbf{A} is defined by $(\mathbf{A})_{i,j} := \min {i,j}$
@@ -30,14 +33,14 @@ void multAminSlow(const VectorXd &x, VectorXd &y) {
     y = ((one * linsp.transpose())
             .cwiseMin(linsp * one.transpose())) * x;
 
-//    std::cout<< "x: "<< x << std::endl<<std::endl;
-//    std::cout << one << std::endl << std::endl;
-//    std::cout << linsp << std::endl << std::endl;
-//    std::cout << linsp.transpose() << std::endl << std::endl;
-//    std::cout <<one*linsp.transpose() << std::endl << std::endl;
-//    std::cout <<linsp*one.transpose() << std::endl << std::endl;
-//   std::cout << ((one * linsp.transpose()).cwiseMin(linsp * one.transpose())) << std::endl << std::endl
-//   std::cout <<"y right: "<< y << std::endl << std::endl;
+//    cout<< "x: "<< x << endl<<endl;
+//    cout << one << endl << endl;
+//    cout << linsp << endl << endl;
+//    cout << linsp.transpose() << endl << endl;
+//    cout <<one*linsp.transpose() << endl << endl;
+//    cout <<linsp*one.transpose() << endl << endl;
+//   cout << ((one * linsp.transpose()).cwiseMin(linsp * one.transpose())) << endl << endl
+//   cout <<"y right: "<< y << endl << endl;
 }
 
 /* \brief compute $\mathbf{A}\mathbf{x}$
@@ -54,7 +57,7 @@ void multAminLoops(const VectorXd &x, VectorXd &y) {
 
     for (unsigned int i = 0; i < n; ++i) {
         for (unsigned int j = 0; j < n; ++j) {
-            A(i, j) = std::min(i + 1, j + 1);
+            A(i, j) = min(i + 1, j + 1);
         }
     }
     y = A * x;
@@ -74,14 +77,14 @@ void multAmin(const VectorXd &x, VectorXd &y) {
         toadd += x(j);
     }
     y(0) = toadd;
-//    std::cout << toadd << std::endl << std::endl;
+//    cout << toadd << endl << endl;
 
     for (int i = 1; i < n; ++i) {
         toadd = toadd - x(i - 1);
         y(i) = y(i - 1) + toadd;
     }
 
-//    std::cout<<"my y: " << y << std::endl << std::endl;
+//    cout<<"my y: " << y << endl << endl;
 
 }
 
@@ -94,7 +97,7 @@ int main(void) {
     multAmin(xa, yf);
     multAminSlow(xa, ys);
     // Error should be small
-    std::cout << "||ys-yf|| = " << (ys - yf).norm() << std::endl;
+    cout << "||ys-yf|| = " << (ys - yf).norm() << endl;
 
 
     unsigned int nLevels = 9;
@@ -104,8 +107,24 @@ int main(void) {
     double *minTimeEff = new double[nLevels];
 
     n[0] = 4;
-    for (unsigned int i = 1; i < nLevels; i++)
+
+    for (unsigned int i = 1; i < nLevels; i++) {
         n[i] = 2 * n[i - 1];
+        VectorXd xa = VectorXd::Random(100 * i);
+        VectorXd ys, yf;
+        high_resolution_clock::time_point t1 = high_resolution_clock::now();
+
+        multAmin(xa, yf);
+
+        high_resolution_clock::time_point t2 = high_resolution_clock::now();
+        duration<double> time_span = chrono::duration_cast<chrono::duration<double>>(t2 - t1);
+        cout << "It took me " << time_span.count() << " seconds." << endl;
+
+    }
+
+
+
+
 
 
 
