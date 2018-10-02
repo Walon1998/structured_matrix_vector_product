@@ -18,12 +18,26 @@ using namespace Eigen;
  * \param[out] y = A*x
  */
 void multAminSlow(const VectorXd &x, VectorXd &y) {
+
     unsigned int n = x.size();
 
     VectorXd one = VectorXd::Ones(n);
+
+
     VectorXd linsp = VectorXd::LinSpaced(n, 1, n);
+
+
     y = ((one * linsp.transpose())
             .cwiseMin(linsp * one.transpose())) * x;
+
+//    std::cout<< "x: "<< x << std::endl<<std::endl;
+//    std::cout << one << std::endl << std::endl;
+//    std::cout << linsp << std::endl << std::endl;
+//    std::cout << linsp.transpose() << std::endl << std::endl;
+//    std::cout <<one*linsp.transpose() << std::endl << std::endl;
+//    std::cout <<linsp*one.transpose() << std::endl << std::endl;
+//   std::cout << ((one * linsp.transpose()).cwiseMin(linsp * one.transpose())) << std::endl << std::endl
+//   std::cout <<"y right: "<< y << std::endl << std::endl;
 }
 
 /* \brief compute $\mathbf{A}\mathbf{x}$
@@ -55,8 +69,19 @@ void multAminLoops(const VectorXd &x, VectorXd &y) {
 void multAmin(const VectorXd &x, VectorXd &y) {
     unsigned int n = x.size();
     y = VectorXd::Zero(n);
+    double toadd = 0;
+    for (int j = 0; j < n; ++j) {
+        toadd += x(j);
+    }
+    y(0) = toadd;
+//    std::cout << toadd << std::endl << std::endl;
 
-    //TODO: Point (b)
+    for (int i = 1; i < n; ++i) {
+        toadd = toadd - x(i - 1);
+        y(i) = y(i - 1) + toadd;
+    }
+
+//    std::cout<<"my y: " << y << std::endl << std::endl;
 
 }
 
@@ -82,57 +107,60 @@ int main(void) {
     for (unsigned int i = 1; i < nLevels; i++)
         n[i] = 2 * n[i - 1];
 
+
+
+
     //TODO: Point (c)
-
-    // Plotting with MathGL
-    double nMgl[nLevels];
-    double ref1[nLevels], ref2[nLevels];
-    for (int i = 0; i < nLevels; i++) {
-        nMgl[i] = n[i];
-        ref1[i] = 1e-8 * pow(n[i], 2);
-        ref2[i] = 1e-7 * n[i];
-    }
-
-    mglData matSize;
-    matSize.Link(nMgl, nLevels);
-
-    mglData data1, data2;
-    mglData dataRef1, dataRef2;
-    data1.Link(minTime, nLevels);
-    data2.Link(minTimeEff, nLevels);
-    dataRef1.Link(ref1, nLevels);
-    dataRef2.Link(ref2, nLevels);
-
-    mglGraph *gr = new mglGraph;
-    gr->Title("Runtime of multAmin");
-    gr->SetRanges(n[0], n[0] * pow(2, nLevels - 1), 1e-6, 1e+1);
-    gr->SetFunc("lg(x)", "lg(y)");
-    gr->Axis();
-    gr->Plot(matSize, data1, "k +");
-    gr->AddLegend("slow", "k +");
-    gr->Plot(matSize, data2, "r +");
-    gr->AddLegend("efficient", "r +");
-    gr->Plot(matSize, dataRef1, "k");
-    gr->AddLegend("O(n^2)", "k");
-    gr->Plot(matSize, dataRef2, "r");
-    gr->AddLegend("O(n)", "r");
-    gr->Label('x', "Matrix size [n]", 0);
-    gr->Label('y', "Runtime [s]", 0);
-    gr->Legend(2);
-    gr->WriteFrame("multAmin_comparison.eps");
-
-
-    // The following code is just for demonstration purposes.
-    // Build Matrix B with dimension 10x10
-    unsigned int nn = 10;
-    MatrixXd B = MatrixXd::Zero(nn, nn);
-    for (unsigned int i = 0; i < nn; ++i) {
-        B(i, i) = 2;
-        if (i < nn - 1) B(i + 1, i) = -1;
-        if (i > 0) B(i - 1, i) = -1;
-    }
-    B(nn - 1, nn - 1) = 1;
-
-    //TODO: Point (e)
+//
+//    // Plotting with MathGL
+//    double nMgl[nLevels];
+//    double ref1[nLevels], ref2[nLevels];
+//    for (int i = 0; i < nLevels; i++) {
+//        nMgl[i] = n[i];
+//        ref1[i] = 1e-8 * pow(n[i], 2);
+//        ref2[i] = 1e-7 * n[i];
+//    }
+//
+//    mglData matSize;
+//    matSize.Link(nMgl, nLevels);
+//
+//    mglData data1, data2;
+//    mglData dataRef1, dataRef2;
+//    data1.Link(minTime, nLevels);
+//    data2.Link(minTimeEff, nLevels);
+//    dataRef1.Link(ref1, nLevels);
+//    dataRef2.Link(ref2, nLevels);
+//
+//    mglGraph *gr = new mglGraph;
+//    gr->Title("Runtime of multAmin");
+//    gr->SetRanges(n[0], n[0] * pow(2, nLevels - 1), 1e-6, 1e+1);
+//    gr->SetFunc("lg(x)", "lg(y)");
+//    gr->Axis();
+//    gr->Plot(matSize, data1, "k +");
+//    gr->AddLegend("slow", "k +");
+//    gr->Plot(matSize, data2, "r +");
+//    gr->AddLegend("efficient", "r +");
+//    gr->Plot(matSize, dataRef1, "k");
+//    gr->AddLegend("O(n^2)", "k");
+//    gr->Plot(matSize, dataRef2, "r");
+//    gr->AddLegend("O(n)", "r");
+//    gr->Label('x', "Matrix size [n]", 0);
+//    gr->Label('y', "Runtime [s]", 0);
+//    gr->Legend(2);
+//    gr->WriteFrame("multAmin_comparison.eps");
+//
+//
+//    // The following code is just for demonstration purposes.
+//    // Build Matrix B with dimension 10x10
+//    unsigned int nn = 10;
+//    MatrixXd B = MatrixXd::Zero(nn, nn);
+//    for (unsigned int i = 0; i < nn; ++i) {
+//        B(i, i) = 2;
+//        if (i < nn - 1) B(i + 1, i) = -1;
+//        if (i > 0) B(i - 1, i) = -1;
+//    }
+//    B(nn - 1, nn - 1) = 1;
+//
+//    //TODO: Point (e)
 
 }

@@ -1,2 +1,10 @@
 Exercise 1.2.
-a) n³
+a) make "one": O(n)
+make "linsp": O(n)
+linsp.transpose: O(n)
+one * linsp.transpose: O(n^2)
+linsp * one.transpose: O(n^2)
+cwiseMin: O(n^2)
+(one * linsp.transpose()).cwiseMin(linsp * one.transpose())) * x : O(n^2)
+
+Gesamt: O(n^2)
