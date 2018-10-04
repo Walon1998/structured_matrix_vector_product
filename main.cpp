@@ -89,100 +89,120 @@ void multAmin(const VectorXd &x, VectorXd &y) {
 }
 
 int main(void) {
-    // Testing correctness of the code
-    unsigned int M = 10;
-    VectorXd xa = VectorXd::Random(M);
-    VectorXd ys, yf;
 
-    multAmin(xa, yf);
-    multAminSlow(xa, ys);
-    // Error should be small
-    cout << "||ys-yf|| = " << (ys - yf).norm() << endl;
-
-
-    unsigned int nLevels = 9;
-    unsigned int *n = new unsigned int[nLevels];
-    double *minTime = new double[nLevels];
-    double *minTimeLoops = new double[nLevels];
-    double *minTimeEff = new double[nLevels];
-
-    n[0] = 4;
-
-    for (unsigned int i = 1; i < nLevels; i++) {
-        n[i] = 2 * n[i - 1];
-    }
-    for (int j = 0; j < nLevels; ++j) {
-        VectorXd xa = VectorXd::Random(n[j]);
-        VectorXd ys, yf;
-        high_resolution_clock::time_point t1 = high_resolution_clock::now();
-        multAmin(xa, yf);
-        high_resolution_clock::time_point t2 = high_resolution_clock::now();
-        duration<double> time_span = chrono::duration_cast<chrono::duration<double>>(t2 - t1);
-        cout << "multAmin took " << time_span.count() << " seconds, for " << n[j] << " elements " << endl;
-    }
-    cout << endl;
-    for (int j = 0; j < nLevels; ++j) {
-        VectorXd xa = VectorXd::Random(n[j]);
-        VectorXd ys, yf;
-        high_resolution_clock::time_point t1 = high_resolution_clock::now();
-        multAminSlow(xa, yf);
-        high_resolution_clock::time_point t2 = high_resolution_clock::now();
-        duration<double> time_span = chrono::duration_cast<chrono::duration<double>>(t2 - t1);
-        cout << "multAminSlow took " << time_span.count() << " seconds, for " << n[j] << " elements " << endl;
-    }
+//    // Testing correctness of the code
+//    unsigned int M = 10;
+//    VectorXd xa = VectorXd::Random(M);
+//    VectorXd ys, yf;
+//
+//    multAmin(xa, yf);
+//    multAminSlow(xa, ys);
+//    // Error should be small
+//    cout << "||ys-yf|| = " << (ys - yf).norm() << endl;
 
 
+//    unsigned int nLevels = 9;
+//    unsigned int *n = new unsigned int[nLevels];
+//    double *minTime = new double[nLevels];
+//    double *minTimeLoops = new double[nLevels];
+//    double *minTimeEff = new double[nLevels];
+//
+//    n[0] = 4;
+//
+//    for (unsigned int i = 1; i < nLevels; i++) {
+//        n[i] = 2 * n[i - 1];
+//    }
+//    for (int j = 0; j < nLevels; ++j) {
+//        VectorXd xa = VectorXd::Random(n[j]);
+//        VectorXd ys, yf;
+//        high_resolution_clock::time_point t1 = high_resolution_clock::now();
+//        multAmin(xa, yf);
+//        high_resolution_clock::time_point t2 = high_resolution_clock::now();
+//        duration<double> time_span = chrono::duration_cast<chrono::duration<double>>(t2 - t1);
+//        cout << "multAmin took " << time_span.count() << " seconds, for " << n[j] << " elements " << endl;
+//        minTimeEff[j]=time_span.count();
+//    }
+//    cout << endl;
+//
+//    for (int j = 0; j < nLevels; ++j) {
+//        VectorXd xa = VectorXd::Random(n[j]);
+//        VectorXd ys, yf;
+//        high_resolution_clock::time_point t1 = high_resolution_clock::now();
+//        multAminSlow(xa, yf);
+//        high_resolution_clock::time_point t2 = high_resolution_clock::now();
+//        duration<double> time_span = chrono::duration_cast<chrono::duration<double>>(t2 - t1);
+//        cout << "multAminSlow took " << time_span.count() << " seconds, for " << n[j] << " elements " << endl;
+//
+//        minTime[j]=time_span.count();
+//    }
 
 
-    // Plotting with MathGL
-    double nMgl[nLevels];
-    double ref1[nLevels], ref2[nLevels];
-    for (int i = 0; i < nLevels; i++) {
-        nMgl[i] = n[i];
-        ref1[i] = 1e-8 * pow(n[i], 2);
-        ref2[i] = 1e-7 * n[i];
-    }
 
-    mglData matSize;
-    matSize.Link(nMgl, nLevels);
 
-    mglData data1, data2;
-    mglData dataRef1, dataRef2;
-    data1.Link(minTime, nLevels);
-    data2.Link(minTimeEff, nLevels);
-    dataRef1.Link(ref1, nLevels);
-    dataRef2.Link(ref2, nLevels);
-
-    mglGraph *gr = new mglGraph;
-    gr->Title("Runtime of multAmin");
-    gr->SetRanges(n[0], n[0] * pow(2, nLevels - 1), 1e-6, 1e+1);
-    gr->SetFunc("lg(x)", "lg(y)");
-    gr->Axis();
-    gr->Plot(matSize, data1, "k +");
-    gr->AddLegend("slow", "k +");
-    gr->Plot(matSize, data2, "r +");
-    gr->AddLegend("efficient", "r +");
-    gr->Plot(matSize, dataRef1, "k");
-    gr->AddLegend("O(n^2)", "k");
-    gr->Plot(matSize, dataRef2, "r");
-    gr->AddLegend("O(n)", "r");
-    gr->Label('x', "Matrix size [n]", 0);
-    gr->Label('y', "Runtime [s]", 0);
-    gr->Legend(2);
-    gr->WriteFrame("multAmin_comparison.eps");
+//    // Plotting with MathGL
+//    double nMgl[nLevels];
+//    double ref1[nLevels], ref2[nLevels];
+//    for (int i = 0; i < nLevels; i++) {
+//        nMgl[i] = n[i];
+//        ref1[i] = 1e-8 * pow(n[i], 2);
+//        ref2[i] = 1e-7 * n[i];
+//    }
+//
+//    mglData matSize;
+//    matSize.Link(nMgl, nLevels);
+//
+//    mglData data1, data2;
+//    mglData dataRef1, dataRef2;
+//    data1.Link(minTime, nLevels);
+//    data2.Link(minTimeEff, nLevels);
+//    dataRef1.Link(ref1, nLevels);
+//    dataRef2.Link(ref2, nLevels);
+//
+//    mglGraph *gr = new mglGraph;
+//    gr->Title("Runtime of multAmin");
+//    gr->SetRanges(n[0], n[0] * pow(2, nLevels - 1), 1e-6, 1e+1);
+//    gr->SetFunc("lg(x)", "lg(y)");
+//    gr->Axis();
+//    gr->Plot(matSize, data1, "k +");
+//    gr->AddLegend("slow", "k +");
+//    gr->Plot(matSize, data2, "r +");
+//    gr->AddLegend("efficient", "r +");
+//    gr->Plot(matSize, dataRef1, "k");
+//    gr->AddLegend("O(n^2)", "k");
+//    gr->Plot(matSize, dataRef2, "r");
+//    gr->AddLegend("O(n)", "r");
+//    gr->Label('x', "Matrix size [n]", 0);
+//    gr->Label('y', "Runtime [s]", 0);
+//    gr->Legend(2);
+//    gr->WriteFrame("multAmin_comparison.eps");
 //
 //
 //    // The following code is just for demonstration purposes.
 //    // Build Matrix B with dimension 10x10
-//    unsigned int nn = 10;
-//    MatrixXd B = MatrixXd::Zero(nn, nn);
-//    for (unsigned int i = 0; i < nn; ++i) {
-//        B(i, i) = 2;
-//        if (i < nn - 1) B(i + 1, i) = -1;
-//        if (i > 0) B(i - 1, i) = -1;
-//    }
-//    B(nn - 1, nn - 1) = 1;
-//
-//    //TODO: Point (e)
+    unsigned int nn = 10;
+    MatrixXd B = MatrixXd::Zero(nn, nn);
+    for (unsigned int i = 0; i < nn; ++i) {
+        B(i, i) = 2;
+        if (i < nn - 1) B(i + 1, i) = -1;
+        if (i > 0) B(i - 1, i) = -1;
+    }
+    B(nn - 1, nn - 1) = 1;
+
+    MatrixXd A(nn, nn);
+
+    for (unsigned int i = 0; i < nn; ++i) {
+        for (unsigned int j = 0; j < nn; ++j) {
+            A(i, j) = min(i + 1, j + 1);
+        }
+    }
+
+    int j = 3;
+    VectorXd e_j = VectorXd::Zero(nn);
+    e_j(j) = 1;
+
+
+    MatrixXd Result = A * B * e_j;
+
+    cout << Result << endl << endl;
 
 }

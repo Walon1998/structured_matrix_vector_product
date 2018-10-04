@@ -8,3 +8,15 @@ cwiseMin: O(n^2)
 (one * linsp.transpose()).cwiseMin(linsp * one.transpose())) * x : O(n^2)
 
 Gesamt: O(n^2)
+
+
+d)
+ 2 -1  0  0  0
+-1  2 -1  0  0
+ 0 -1  2 -1  0
+ 0  0 -1  2 -1
+ 0  0  0 -1  1
+
+
+ e) AB(e_j) = e_j
+ Since A*B is equal to the Einheitsmatrix.
